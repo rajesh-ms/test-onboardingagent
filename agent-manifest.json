@@ -1,0 +1,34 @@
+{
+  "name": "Test Claim Management Agent",
+  "version": "1.0.0",
+  "description": "Demo claim management agent that validates claim intake, routes exception cases, and prepares a human reviewer handoff for AI Marketplace onboarding.",
+  "owner": {
+    "team": "claims-modernization",
+    "email": "claims-modernization@example.com"
+  },
+  "runtime": {
+    "type": "aca",
+    "image": "ghcr.io/rajesh-ms/test-onboardingagent:1.0.0"
+  },
+  "capabilities": [
+    "claim-intake-validation",
+    "claim-routing",
+    "human-review-handoff"
+  ],
+  "rai": {
+    "tags": [
+      "human-in-the-loop",
+      "no-autonomous-denial"
+    ],
+    "data_categories": [
+      "pii"
+    ]
+  },
+  "repository": {
+    "url": "https://github.com/rajesh-ms/test-onboardingagent",
+    "branch": "main"
+  },
+  "network": {
+    "egress": false
+  }
+}

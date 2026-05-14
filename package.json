@@ -1,0 +1,14 @@
+{
+  "name": "test-onboardingagent",
+  "version": "1.0.0",
+  "description": "Claim management agent used to demonstrate AI Marketplace onboarding from GitHub PR to marketplace activation.",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test test/*.test.js",
+    "validate:manifest": "node scripts/validate-manifest.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

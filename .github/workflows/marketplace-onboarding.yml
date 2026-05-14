@@ -1,0 +1,89 @@
+name: Claim Agent Marketplace Onboarding
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  MARKETPLACE_API_URL: ${{ vars.MARKETPLACE_API_URL }}
+  MARKETPLACE_TENANT_ID: ${{ vars.MARKETPLACE_TENANT_ID }}
+  DEPLOYMENT_ENDPOINT_URL: ${{ vars.DEPLOYMENT_ENDPOINT_URL }}
+  DEMO_AUTO_APPROVE: ${{ vars.DEMO_AUTO_APPROVE }}
+  HAS_GITHUB_WEBHOOK_SECRET: ${{ secrets.GITHUB_WEBHOOK_SECRET != '' }}
+  HAS_DEPLOYMENT_OUTPUTS_SECRET: ${{ secrets.DEPLOYMENT_OUTPUTS_SECRET != '' }}
+
+jobs:
+  validate-and-onboard:
+    name: Validate claim agent and invoke onboarding
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+      - name: Validate manifest
+        run: npm run validate:manifest
+
+      - name: Post validation webhook checkpoint
+        if: env.MARKETPLACE_API_URL != '' && env.HAS_GITHUB_WEBHOOK_SECRET == 'true'
+        shell: pwsh
+        env:
+          GITHUB_WEBHOOK_SECRET: ${{ secrets.GITHUB_WEBHOOK_SECRET }}
+        run: ./.github/scripts/send-webhook-checkpoint.ps1 -Stage validation -Conclusion success
+
+      - name: Create onboarding submission
+        if: env.MARKETPLACE_API_URL != ''
+        id: submission
+        shell: pwsh
+        run: ./.github/scripts/submit-onboarding.ps1
+
+      - name: Post provenance and scan evidence
+        if: env.MARKETPLACE_API_URL != ''
+        shell: pwsh
+        run: ./.github/scripts/post-validation-evidence.ps1 -SubmissionId '${{ steps.submission.outputs.submission_id }}'
+
+      - name: Publish approved agent to marketplace
+        if: github.event_name != 'pull_request' && env.MARKETPLACE_API_URL != '' && env.HAS_DEPLOYMENT_OUTPUTS_SECRET == 'true' && vars.DEMO_AUTO_APPROVE == 'true'
+        id: publish
+        shell: pwsh
+        env:
+          DEPLOYMENT_OUTPUTS_SECRET: ${{ secrets.DEPLOYMENT_OUTPUTS_SECRET }}
+          GITHUB_WEBHOOK_SECRET: ${{ secrets.GITHUB_WEBHOOK_SECRET }}
+        run: ./.github/scripts/publish-to-marketplace.ps1 -SubmissionId '${{ steps.submission.outputs.submission_id }}'
+
+      - name: Write onboarding summary
+        shell: pwsh
+        run: |
+          "### Claim Agent Marketplace Onboarding" >> $env:GITHUB_STEP_SUMMARY
+          "- Code tests: passed" >> $env:GITHUB_STEP_SUMMARY
+          "- Manifest validation: passed" >> $env:GITHUB_STEP_SUMMARY
+          if ('${{ steps.submission.outputs.submission_id }}') {
+            "- Submission ID: `${{ steps.submission.outputs.submission_id }}`" >> $env:GITHUB_STEP_SUMMARY
+            "- Status: `${{ steps.submission.outputs.status }}`" >> $env:GITHUB_STEP_SUMMARY
+            "- Stage: `${{ steps.submission.outputs.stage }}`" >> $env:GITHUB_STEP_SUMMARY
+            "- Risk tier: `${{ steps.submission.outputs.risk_tier }}`" >> $env:GITHUB_STEP_SUMMARY
+          } else {
+            "- Marketplace API calls: skipped because MARKETPLACE_API_URL is not configured" >> $env:GITHUB_STEP_SUMMARY
+          }
+          if ('${{ steps.publish.outputs.activation_status }}') {
+            "- Activation: `${{ steps.publish.outputs.activation_status }}`" >> $env:GITHUB_STEP_SUMMARY
+            "- Agent ID: `${{ steps.publish.outputs.agent_id }}`" >> $env:GITHUB_STEP_SUMMARY
+          }
