@@ -1,6 +1,6 @@
 {
   "name": "Test Claim Management Agent",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Demo claim management agent that validates claim intake, routes exception cases, and prepares a human reviewer handoff for AI Marketplace onboarding.",
   "owner": {
     "team": "claims-modernization",
@@ -13,6 +13,7 @@
   "capabilities": [
     "claim-intake-validation",
     "claim-routing",
+    "prior-authorization-review",
     "human-review-handoff"
   ],
   "rai": {

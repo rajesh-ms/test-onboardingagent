@@ -76,14 +76,14 @@ jobs:
           "- Code tests: passed" >> $env:GITHUB_STEP_SUMMARY
           "- Manifest validation: passed" >> $env:GITHUB_STEP_SUMMARY
           if ('${{ steps.submission.outputs.submission_id }}') {
-            "- Submission ID: `${{ steps.submission.outputs.submission_id }}`" >> $env:GITHUB_STEP_SUMMARY
-            "- Status: `${{ steps.submission.outputs.status }}`" >> $env:GITHUB_STEP_SUMMARY
-            "- Stage: `${{ steps.submission.outputs.stage }}`" >> $env:GITHUB_STEP_SUMMARY
-            "- Risk tier: `${{ steps.submission.outputs.risk_tier }}`" >> $env:GITHUB_STEP_SUMMARY
+            "- Submission ID: ${{ steps.submission.outputs.submission_id }}" >> $env:GITHUB_STEP_SUMMARY
+            "- Status: ${{ steps.submission.outputs.status }}" >> $env:GITHUB_STEP_SUMMARY
+            "- Stage: ${{ steps.submission.outputs.stage }}" >> $env:GITHUB_STEP_SUMMARY
+            "- Risk tier: ${{ steps.submission.outputs.risk_tier }}" >> $env:GITHUB_STEP_SUMMARY
           } else {
             "- Marketplace API calls: skipped because MARKETPLACE_API_URL is not configured" >> $env:GITHUB_STEP_SUMMARY
           }
           if ('${{ steps.publish.outputs.activation_status }}') {
-            "- Activation: `${{ steps.publish.outputs.activation_status }}`" >> $env:GITHUB_STEP_SUMMARY
-            "- Agent ID: `${{ steps.publish.outputs.agent_id }}`" >> $env:GITHUB_STEP_SUMMARY
+            "- Activation: ${{ steps.publish.outputs.activation_status }}" >> $env:GITHUB_STEP_SUMMARY
+            "- Agent ID: ${{ steps.publish.outputs.agent_id }}" >> $env:GITHUB_STEP_SUMMARY
           }
