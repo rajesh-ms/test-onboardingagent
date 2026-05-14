@@ -16,7 +16,7 @@ env:
   MARKETPLACE_TENANT_ID: ${{ vars.MARKETPLACE_TENANT_ID }}
   DEPLOYMENT_ENDPOINT_URL: ${{ vars.DEPLOYMENT_ENDPOINT_URL }}
   DEMO_AUTO_APPROVE: ${{ vars.DEMO_AUTO_APPROVE }}
-  HAS_GITHUB_WEBHOOK_SECRET: ${{ secrets.GITHUB_WEBHOOK_SECRET != '' }}
+  HAS_UAP_WEBHOOK_SECRET: ${{ secrets.UAP_WEBHOOK_SECRET != '' }}
   HAS_DEPLOYMENT_OUTPUTS_SECRET: ${{ secrets.DEPLOYMENT_OUTPUTS_SECRET != '' }}
 
 jobs:
@@ -43,10 +43,10 @@ jobs:
         run: npm run validate:manifest
 
       - name: Post validation webhook checkpoint
-        if: env.MARKETPLACE_API_URL != '' && env.HAS_GITHUB_WEBHOOK_SECRET == 'true'
+        if: env.MARKETPLACE_API_URL != '' && env.HAS_UAP_WEBHOOK_SECRET == 'true'
         shell: pwsh
         env:
-          GITHUB_WEBHOOK_SECRET: ${{ secrets.GITHUB_WEBHOOK_SECRET }}
+          UAP_WEBHOOK_SECRET: ${{ secrets.UAP_WEBHOOK_SECRET }}
         run: ./.github/scripts/send-webhook-checkpoint.ps1 -Stage validation -Conclusion success
 
       - name: Create onboarding submission
@@ -66,7 +66,7 @@ jobs:
         shell: pwsh
         env:
           DEPLOYMENT_OUTPUTS_SECRET: ${{ secrets.DEPLOYMENT_OUTPUTS_SECRET }}
-          GITHUB_WEBHOOK_SECRET: ${{ secrets.GITHUB_WEBHOOK_SECRET }}
+          UAP_WEBHOOK_SECRET: ${{ secrets.UAP_WEBHOOK_SECRET }}
         run: ./.github/scripts/publish-to-marketplace.ps1 -SubmissionId '${{ steps.submission.outputs.submission_id }}'
 
       - name: Write onboarding summary

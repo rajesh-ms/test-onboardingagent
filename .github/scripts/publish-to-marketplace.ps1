@@ -84,7 +84,7 @@ $deploymentHeaders["x-uap-signature-256"] = $signature
 $activation = Invoke-RestMethod -Method Post -Uri "$apiUrl/api/submissions/$SubmissionId/deployment-outputs" -Headers $deploymentHeaders -Body $deploymentPayload
 $activation | ConvertTo-Json -Depth 20
 
-if ($env:GITHUB_WEBHOOK_SECRET) {
+if ($env:UAP_WEBHOOK_SECRET -or $env:GITHUB_WEBHOOK_SECRET) {
   pwsh ./.github/scripts/send-webhook-checkpoint.ps1 -SubmissionId $SubmissionId -Stage activation -Conclusion success
 }
 

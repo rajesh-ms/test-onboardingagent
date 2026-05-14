@@ -44,8 +44,9 @@ if (-not $env:MARKETPLACE_API_URL) {
   throw "MARKETPLACE_API_URL is required."
 }
 
-if (-not $env:GITHUB_WEBHOOK_SECRET) {
-  throw "GITHUB_WEBHOOK_SECRET is required to sign webhook checkpoints."
+$webhookSecret = if ($env:UAP_WEBHOOK_SECRET) { $env:UAP_WEBHOOK_SECRET } else { $env:GITHUB_WEBHOOK_SECRET }
+if (-not $webhookSecret) {
+  throw "UAP_WEBHOOK_SECRET is required to sign webhook checkpoints."
 }
 
 $apiUrl = $env:MARKETPLACE_API_URL.TrimEnd("/")
@@ -79,7 +80,7 @@ $payload = @{
   }
 } | ConvertTo-Json -Depth 20 -Compress
 
-$signature = New-HmacSignature -Secret $env:GITHUB_WEBHOOK_SECRET -Payload $payload
+$signature = New-HmacSignature -Secret $webhookSecret -Payload $payload
 $headers = @{
   "Content-Type" = "application/json"
   "x-github-event" = "workflow_run"

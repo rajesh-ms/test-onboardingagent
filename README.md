@@ -16,7 +16,7 @@ npm test
 npm run validate:manifest
 $env:MARKETPLACE_API_URL="http://localhost:7071"
 $env:MARKETPLACE_TENANT_ID="contoso"
-$env:GITHUB_WEBHOOK_SECRET="local-demo-webhook-secret"
+$env:UAP_WEBHOOK_SECRET="local-demo-webhook-secret"
 $env:DEPLOYMENT_OUTPUTS_SECRET="local-demo-deployment-secret"
 pwsh .\.github\scripts\submit-onboarding.ps1
 $submission = Get-Content .\.onboarding-submission.json -Raw | ConvertFrom-Json
@@ -34,7 +34,7 @@ gh variable set MARKETPLACE_API_URL --body "https://<marketplace-api-host>"
 gh variable set MARKETPLACE_TENANT_ID --body "contoso"
 gh variable set DEMO_AUTO_APPROVE --body "true"
 gh variable set DEPLOYMENT_ENDPOINT_URL --body "https://<claim-agent-endpoint>"
-gh secret set GITHUB_WEBHOOK_SECRET --body "<same-secret-as-marketplace-api>"
+gh secret set UAP_WEBHOOK_SECRET --body "<same-secret-as-marketplace-api>"
 gh secret set DEPLOYMENT_OUTPUTS_SECRET --body "<same-secret-as-marketplace-api>"
 ```
 
