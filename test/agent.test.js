@@ -19,6 +19,18 @@ test('routes high value claims to human review', () => {
   assert.equal(result.priority, 'high');
 });
 
+test('routes prior authorization claims to human review', () => {
+  const result = evaluateClaimSubmission({
+    claimId: 'CLM-1004',
+    memberId: 'MBR-11',
+    procedureCode: '27447',
+    amount: 4000,
+    requiresPriorAuthorization: true,
+  });
+  assert.equal(result.decision, 'requires-review');
+  assert.equal(result.nextStep, 'route-to-claims-reviewer');
+});
+
 test('builds an auditable reviewer handoff', () => {
   const claim = { claimId: 'CLM-1003', memberId: 'MBR-10', procedureCode: '70551', amount: 1000 };
   const evaluation = evaluateClaimSubmission(claim);
